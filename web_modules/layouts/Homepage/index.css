@@ -1,0 +1,32 @@
+.front {
+  font-family: 'Josefin Sans';
+}
+
+.picture {
+  position: relative;
+  float: left;
+  height: 100vh;
+  width: 55vw;
+  background: url(/assets/headshot_small.jpg);
+  background-size: cover;
+  background-position: top, center;
+  background-repeat: no-repeat;
+  left: 0;
+  top: 0;
+}
+
+.sideText {
+  position: relative;
+  float: right;
+  right: 0;
+  top: 0;
+  width: 40vw;
+  padding: 40px;
+}
+
+.socialBlock {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
