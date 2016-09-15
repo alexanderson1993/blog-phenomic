@@ -1,5 +1,6 @@
 ---
 title: R. Alex Anderson
+layout: Resume
 ---
 
 ---

@@ -11,6 +11,7 @@ import Homepage from "../layouts/Homepage"
 import Post from "../layouts/Post"
 import PostIndex from "../layouts/PostIndex"
 import Social from "../layouts/Social"
+import Resume from "../layouts/Resume"
 class PageContainer extends Component {
   render() {
     const { props } = this
@@ -25,6 +26,7 @@ class PageContainer extends Component {
           Post,
           PostIndex,
           Social,
+          Resume,
         } }
       />
     )
