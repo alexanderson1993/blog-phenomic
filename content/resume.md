@@ -34,12 +34,6 @@ layout: Resume
 #### [Shankyou.me](http://shankyou.me)
 An assassin game for multiple players. Uses Facebook to handle user logins, manages target assignment and reassignment upon elimination.
 
----
-## Writing
-
-#### [It is what it is](http://ralexanderson.com/blog) *<small>@ralexanderson.com/blog</small>*
-
----
 
 [homepage]: http://ralexanderson.com
 [twitter]: https://twitter.com/ralex1993
