@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[blog-phenomic]]></title><description><![CDATA[blog-phenomic]]></description><link>http://ralexanderson.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 15 Sep 2016 15:41:01 GMT</lastBuildDate><atom:link href="http://ralexanderson.com/feed.xml" rel="self" type="application/rss+xml"/><item><title><![CDATA[Why I prefer Elixir/Phoenix to Meteor]]></title><description><![CDATA[<ul>
+<li>
+<p>Build times are much faster. I’m a ‘code it, save it, check it’ kind of programmer, programming features bit by bit rather than all at once. Meteor rebuilds (on the server especially) take a really long time. On Elixir (with Webpack, in my case), it’s virtually instantaneous, meaning less time to get distracted.</p>
+</li>
+<li>
+<p>Pattern matching has saved my bacon on more than one occasion already. Writing GraphQL queries which have different arguments with the premier GraphQL library (<a href="http://graphql-elixir.org/">http://graphql-elixir.org/</a>) is a cinch. I’m sure I’ll just keep finding uses for that language feature.</p>
+</li>
+</ul>
+<p><strong>More to come</strong></p>
+]]></description><link>http://ralexanderson.com/posts/2016-06-22-why-i-prefer-elixir-to-meteor/</link><guid isPermaLink="true">http://ralexanderson.com/posts/2016-06-22-why-i-prefer-elixir-to-meteor/</guid><pubDate>Wed, 22 Jun 2016 00:00:00 GMT</pubDate></item><item><title><![CDATA[Funtimes with Elixir and Phoenix]]></title><description><![CDATA[<p>I’m starting to learn Elixir with the Phoenix Framework. This project has a pretty intense stack. I don’t know a whole lot about all of the pieces, but I can try to explain it here:</p>
+<ol>
+<li>
+<p>The front-end will be designed with React, a view framework built by Facebook. It’s designed to be highly composable, functional, and fast. Each component is designed to be a stateless function which returns the code necessary to create the objects in the DOM.</p>
+</li>
+<li>
+<p>The front-end data layer will be Redux. Redux was invented to solve the problem of state management. It is mostly used with React, but can be used with just about anything. It focuses around a single state store which is immutable. It can only be updated by firing actions, which in turn trigger reducers which then update the state store.</p>
+</li>
+<li>
+<p>Elixir is a functional programming language based off of Erlang. It’s designed for concurrency and crazy-high uptime. There’s a whole lot about it that I don’t understand, but that’s the whole point of this exercise, right? Phoenix serves as the web and application server for this project. It connects to Redux via websockets, which Phoenix supports natively. This will provide real-time communication between the server and Redux.</p>
+</li>
+<li>
+<p>The database is RethinkDB, an open-source JSON storage DB built around real-time comunications. It’s most often compared to Mongo, but excels in speed, durability (eg. the way it handles reads and writes) and real-time pushing of data.</p>
+</li>
+</ol>
+<p>As someone who is used to the monolithic archetecture of Meteor (client, server, and database all connected together), this is both daunting and exciting. I’m not really used to pieces that connect together like this and with all these moving parts I fear that things might break suddenly. However, this will provide for improvements in modularity, code quality and readability, and explicitness in how the project is designed (Mongo is notorious for poor to no schema support.)</p>
+<p>This means that I’ll be able to pull out any of these pieces and replace them with anything else. I could pull out React and use Angular (or even jQuery) and link it up with Redux. Phoenix becomes too daunting? I can switch it to Node or something else fairly simply.</p>
+<p>This will be very useful when this project grows and has more features and use cases, I’ll be building apps with React-Native. With websockets, I can just plug these into the database and it’ll just work.</p>
+<p>I’ll continue writing things which relate to this, along with other things which come up in my programming adventures.</p>
+]]></description><link>http://ralexanderson.com/posts/2016-06-20-funtimes-with-elixir-and-phoenix/</link><guid isPermaLink="true">http://ralexanderson.com/posts/2016-06-20-funtimes-with-elixir-and-phoenix/</guid><pubDate>Mon, 20 Jun 2016 00:00:00 GMT</pubDate></item><item><title><![CDATA[Dynamically Updating Javascript Resources for React Native if you don’t know what you are doing with Objective-C]]></title><description><![CDATA[<p>For a project at work, I’m creating a React Native app. The nice thing about React Native is you can load the javascript bundle (the brains of the app, so to speak) from a remote server. This means that you can make updates and changes without having to go through the App Store approval process.</p>
+<p>The downside to this is that it takes a second or two to load the bundle before the app itself actually loads. Unless you have some fancy Objective-C or Swift ‘Loading’ animation, it’s just going to show a white screen. I don’t have any experience with iOS programming, so I decided to do the next best thing — load the bundle from the device locally.
+I was able to piece together most of what to do from this guide, but some of it I had to figure out on my own.</p>
+<p><a href="https://medium.com/ios-os-x-development/so-you-want-to-dynamically-update-your-react-native-app-d1d88bf11ede#.qzg6q5n3o">So You Want To Dynamically Update Your React Native App</a></p>
+<p>At work we recently shipped our first React Native components inside an app, and I’ve been mulling how (and if…medium.com
+React Native gives you the option to have the JS bundle stored in the application bundle, which gives you almost instant load times. I could use that mechanism to do what I wanted.</p>
+<p>First, I needed to check to see if there was a downloaded JS bundle or if I needed to use the app’s bundle:</p>
+<pre><code>//This is the document directory of the app itself.
+NSString *documentDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+//filePath represents where the downloaded bundle resides. It's in the documents directory of the app.
+NSString *filePath = [documentDir stringByAppendingPathComponent:@”main-loaded.jsbundle”];
+NSURL *codeLocation = [NSURL URLWithString:filePath];
+
+//use the application bundle if there is no file in the execution path
+if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+//Load the app bundle's javascript
+jsCodeLocation = [[NSBundle mainBundle] URLForResource:@”main” withExtension:@”jsbundle”];
+NSLog(@”Loaded from application bundle”);
+} else {
+//Load the downloaded Javascript bundle.
+jsCodeLocation = codeLocation;
+NSLog(@”Loaded from remote bundle”);
+}
+</code></pre>
+<p>If you just throw this into your AppDelegate.m file, it will load the application bundle every time, since it isn’t downloading anything to the documents folder.</p>
+<p>Next I asynchronously load the Javascript bundle from the remote server (in my case, I use Amazon S3 to host it)</p>
+<pre><code>remoteCode = [NSURL URLWithString:@”https://***path to your javascript bundle***"];
+//Make the request asynchronously
+NSURLRequest *request = [NSURLRequest requestWithURL:remoteCode];
+[NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+if (error) {
+NSLog(@”Download Error:%@”,error.description);
+}
+if (data) {
+//Save the data to the file path
+[data writeToFile:filePath atomically:YES];
+NSLog(@”File is saved to %@”,filePath);
+}
+}];
+</code></pre>
+<p>This is going to download the bundle and save it to the file path, but only after the application has already loaded.</p>
+<p>Finally, use the boilerplate React Native code to insert the React Native view into the Objective-C app.</p>
+<pre><code>RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
+moduleName:@”***Name of your module***”
+initialProperties:nil
+launchOptions:launchOptions];
+</code></pre>
+<p>Now, whenever your app loads, it will use the downloaded version of your Javascript bundle.</p>
+]]></description><link>http://ralexanderson.com/posts/2016-06-03-dynamic-javascript-react-native/</link><guid isPermaLink="true">http://ralexanderson.com/posts/2016-06-03-dynamic-javascript-react-native/</guid><pubDate>Fri, 03 Jun 2016 00:00:00 GMT</pubDate></item></channel></rss>
